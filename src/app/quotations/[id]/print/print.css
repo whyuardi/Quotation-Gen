@@ -1,0 +1,70 @@
+/* Print-specific styles for A4 document layout */
+
+/* Reset for print document - white background, black text */
+.print-document {
+  font-family: "Arial", "Helvetica", sans-serif;
+  color: #000;
+  background: #fff;
+}
+
+/* A4 Page container */
+.print-page {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm 12mm;
+  margin: 0 auto 20px auto;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  box-sizing: border-box;
+  page-break-after: always;
+}
+
+/* Remove shadow in print mode */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-page {
+    width: 100%;
+    min-height: auto;
+    padding: 5mm 8mm;
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+
+  .print-page:last-child {
+    page-break-after: auto;
+  }
+
+  /* Force background colors to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide non-print elements */
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Screen-only: Center pages and add spacing */
+@media screen {
+  .print-document {
+    padding: 20px 0;
+    background: #e5e7eb;
+    min-height: 100vh;
+  }
+}

@@ -1,0 +1,164 @@
+// Prisma Schema for Solar Pump Quotation Generator
+// Database: Neon PostgreSQL (free tier)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Product (pump model) ────────────────────────────────────────────────────
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String // e.g. "SOLAR 2 DCSSP 3000"
+  modelCode     String   @unique @map("model_code") // e.g. "SOLAR-2-DCSSP-3000"
+
+  // JSON field with all technical specs
+  // Shape: { head_range, flow_lpm, discharge, suction_size_mm, delivery_size_mm,
+  //          pv_watt, motor_power_kw, motor_speed_range, motor_efficiency,
+  //          controller_input_voltage, controller_max_eff, controller_current,
+  //          controller_enclosure_class, controller_ambient_temp,
+  //          pump_outlet, joining, impeller, shaft, casing,
+  //          max_water_temp, pumpset_code, order_code, motor_code,
+  //          motor_enclosure_class, controller_name, controller_min_voltage }
+  specs Json
+
+  // Pump performance curve data
+  // Shape: [{ head: number, points: [{ power_watt: number, flow_lpm: number }] }]
+  pumpCurveData Json? @map("pump_curve_data")
+
+  // Dimension tables in mm
+  // Shape: { pump: { A, B, C, D, E, Rp, ... }, controller: { A, B, C, D, E, F, G } }
+  dimensionTable Json? @map("dimension_table")
+
+  // Net weight in kg
+  // Shape: { pump: string|number, motor: string|number, controller: string|number }
+  netWeight Json? @map("net_weight")
+
+  // Relations
+  images     ProductImage[]
+  priceItems PriceItem[]
+  quotations Quotation[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+// ─── ProductImage ────────────────────────────────────────────────────────────
+
+enum ImageType {
+  DIMENSION_PUMP
+  DIMENSION_CONTROLLER
+  LAYOUT_DIAGRAM
+  LOGO
+}
+
+model ProductImage {
+  id        String    @id @default(cuid())
+  productId String    @map("product_id")
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type      ImageType
+  url       String // Cloudflare R2 URL (or placeholder for now)
+  caption   String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("product_images")
+}
+
+// ─── PriceItem (BOM line items) ──────────────────────────────────────────────
+
+model PriceItem {
+  id          String  @id @default(cuid())
+  productId   String? @map("product_id") // nullable — some items are shared
+  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  description    String
+  qtyIn1Set      Int      @map("qty_in_1_set")
+  unit           String   @default("pcs")
+  pricePerUnitUsd Decimal @map("price_per_unit_usd") @db.Decimal(12, 2)
+
+  sortOrder Int @default(0) @map("sort_order") // controls display order in quotation
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("price_items")
+}
+
+// ─── Quotation ───────────────────────────────────────────────────────────────
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+}
+
+model Quotation {
+  id        String @id @default(cuid())
+
+  // Auto-generated: NNN/JGD/ROMAN_MONTH/YY (e.g. "002/JGD/VII/26")
+  refNumber String @unique @map("ref_number")
+
+  date         DateTime @default(now())
+  validityDate DateTime @map("validity_date")
+
+  // Client info
+  clientName    String  @map("client_name")
+  clientCompany String? @map("client_company")
+
+  // Project location
+  projectLocationName String? @map("project_location_name")
+  latitude            Float?
+  longitude           Float?
+
+  // Product reference
+  productId   String  @map("product_id")
+  product     Product @relation(fields: [productId], references: [id])
+  numPumpsets Int     @map("num_pumpsets") // number of sets (e.g. 6)
+
+  // Terms
+  paymentTerms     String? @map("payment_terms") @db.Text
+  shipmentSchedule String? @map("shipment_schedule") @db.Text
+
+  // Status
+  status QuotationStatus @default(DRAFT)
+
+  // Snapshot of calculated totals at creation time (for record keeping)
+  // Shape: { lineItems: [...], grandTotal: number }
+  calculatedTotals Json? @map("calculated_totals")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("quotations")
+}
+
+// ─── LocationIrradiationCache ────────────────────────────────────────────────
+
+model LocationIrradiationCache {
+  id        String @id @default(cuid())
+
+  // Rounded to 2 decimal places for cache key
+  latitude  Float
+  longitude Float
+
+  // Monthly solar irradiation in kWh/m2/day (12 values: JAN..DEC)
+  // Shape: { JAN: number, FEB: number, ..., DEC: number }
+  monthlyIrradiation Json @map("monthly_irradiation")
+
+  // Computed average daily flow in liters (12 monthly values)
+  // Shape: { JAN: number, FEB: number, ..., DEC: number }
+  avgDailyFlowLiter Json? @map("avg_daily_flow_liter")
+
+  fetchedAt DateTime @default(now()) @map("fetched_at")
+
+  @@unique([latitude, longitude])
+  @@map("location_irradiation_cache")
+}
