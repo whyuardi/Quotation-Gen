@@ -100,88 +100,149 @@ export default function QuotationsPage() {
           </div>
         )}
 
-        {/* Quotation Table */}
+        {/* Quotation View */}
         {!loading && quotations.length > 0 && (
-          <div className="border border-zinc-800/80 rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-[13px] min-w-[800px] md:min-w-0">
-                <thead>
-                  <tr className="border-b border-zinc-800/80 bg-zinc-900/50">
-                    <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Ref</th>
-                    <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Client</th>
-                    <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Product</th>
-                    <th className="text-right px-4 py-2.5 text-zinc-500 font-medium">Sets</th>
-                    <th className="text-right px-4 py-2.5 text-zinc-500 font-medium">Total (USD)</th>
-                    <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Date</th>
-                    <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Status</th>
-                    <th className="w-24 px-4 py-2.5"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quotations.map((q) => {
-                    const st = statusConfig[q.status] || statusConfig.DRAFT;
-                    return (
-                      <tr key={q.id} className="border-b border-zinc-800/40 hover:bg-zinc-900/60 transition-colors group">
-                        <td className="px-4 py-3">
-                          <Link href={`/quotations/${q.id}`} className="font-mono text-zinc-200 hover:text-white">
-                            {q.refNumber}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-3 text-zinc-300">
-                          {q.clientName}
-                          {q.clientCompany && <span className="text-zinc-600 ml-1">({q.clientCompany})</span>}
-                        </td>
-                        <td className="px-4 py-3 text-zinc-400">{q.product.modelCode}</td>
-                        <td className="px-4 py-3 text-right text-zinc-400 tabular-nums">{q.numPumpsets}</td>
-                        <td className="px-4 py-3 text-right font-mono text-zinc-200 tabular-nums">
-                          {q.calculatedTotals ? fmtUsd(q.calculatedTotals.grandTotal) : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-zinc-500 tabular-nums">{fmtDate(q.date)}</td>
-                        <td className="px-4 py-3">
-                          <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${st.class}`}>
-                            {st.label}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Link
-                              href={`/quotations/${q.id}/print`}
-                              target="_blank"
-                              className="p-1.5 text-zinc-500 hover:text-zinc-300 rounded transition-colors"
-                              title="Print"
-                            >
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
-                              </svg>
-                            </Link>
-                            <Link
-                              href={`/quotations/${q.id}`}
-                              className="p-1.5 text-zinc-500 hover:text-zinc-300 rounded transition-colors"
-                              title="View"
-                            >
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                            </Link>
-                            <button
-                              onClick={() => handleDelete(q.id, q.refNumber)}
-                              className="p-1.5 text-zinc-500 hover:text-red-400 rounded transition-colors"
-                              title="Delete"
-                            >
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          <>
+            {/* Mobile View */}
+            <div className="block md:hidden space-y-3">
+              {quotations.map((q) => {
+                const st = statusConfig[q.status] || statusConfig.DRAFT;
+                return (
+                  <div key={q.id} className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Link href={`/quotations/${q.id}`} className="font-mono text-zinc-200 hover:text-white font-medium">
+                        {q.refNumber}
+                      </Link>
+                      <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${st.class}`}>
+                        {st.label}
+                      </span>
+                    </div>
+
+                    <div className="text-zinc-300">
+                      <p className="font-medium text-white">{q.clientName}</p>
+                      {q.clientCompany && <p className="text-xs text-zinc-500">{q.clientCompany}</p>}
+                    </div>
+
+                    <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-xs text-zinc-400">
+                      <div>
+                        <p>{q.product.modelCode} · {q.numPumpsets} set{q.numPumpsets > 1 ? "s" : ""}</p>
+                        <p className="text-zinc-500 mt-0.5">{fmtDate(q.date)}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-zinc-200 font-mono">
+                          {q.calculatedTotals ? `$${fmtUsd(q.calculatedTotals.grandTotal)}` : "—"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-end gap-2">
+                      <Link
+                        href={`/quotations/${q.id}/print`}
+                        target="_blank"
+                        className="px-2 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 rounded-lg text-xs flex items-center gap-1"
+                      >
+                        Print
+                      </Link>
+                      <Link
+                        href={`/quotations/${q.id}`}
+                        className="px-2 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 rounded-lg text-xs flex items-center gap-1"
+                      >
+                        View
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(q.id, q.refNumber)}
+                        className="px-2 py-1 bg-zinc-900/50 border border-zinc-800/50 text-zinc-500 hover:text-red-400 rounded-lg text-xs flex items-center gap-1"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
+
+            {/* Desktop View */}
+            <div className="hidden md:block border border-zinc-800/80 rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-[13px] min-w-[800px] md:min-w-0">
+                  <thead>
+                    <tr className="border-b border-zinc-800/80 bg-zinc-900/50">
+                      <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Ref</th>
+                      <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Client</th>
+                      <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Product</th>
+                      <th className="text-right px-4 py-2.5 text-zinc-500 font-medium">Sets</th>
+                      <th className="text-right px-4 py-2.5 text-zinc-500 font-medium">Total (USD)</th>
+                      <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Date</th>
+                      <th className="text-left px-4 py-2.5 text-zinc-500 font-medium">Status</th>
+                      <th className="w-24 px-4 py-2.5"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {quotations.map((q) => {
+                      const st = statusConfig[q.status] || statusConfig.DRAFT;
+                      return (
+                        <tr key={q.id} className="border-b border-zinc-800/40 hover:bg-zinc-900/60 transition-colors group">
+                          <td className="px-4 py-3">
+                            <Link href={`/quotations/${q.id}`} className="font-mono text-zinc-200 hover:text-white">
+                              {q.refNumber}
+                            </Link>
+                          </td>
+                          <td className="px-4 py-3 text-zinc-300">
+                            {q.clientName}
+                            {q.clientCompany && <span className="text-zinc-600 ml-1">({q.clientCompany})</span>}
+                          </td>
+                          <td className="px-4 py-3 text-zinc-400">{q.product.modelCode}</td>
+                          <td className="px-4 py-3 text-right text-zinc-400 tabular-nums">{q.numPumpsets}</td>
+                          <td className="px-4 py-3 text-right font-mono text-zinc-200 tabular-nums">
+                            {q.calculatedTotals ? fmtUsd(q.calculatedTotals.grandTotal) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-zinc-500 tabular-nums">{fmtDate(q.date)}</td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${st.class}`}>
+                              {st.label}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Link
+                                href={`/quotations/${q.id}/print`}
+                                target="_blank"
+                                className="p-1.5 text-zinc-500 hover:text-zinc-300 rounded transition-colors"
+                                title="Print"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+                                </svg>
+                              </Link>
+                              <Link
+                                href={`/quotations/${q.id}`}
+                                className="p-1.5 text-zinc-500 hover:text-zinc-300 rounded transition-colors"
+                                title="View"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                              </Link>
+                              <button
+                                onClick={() => handleDelete(q.id, q.refNumber)}
+                                className="p-1.5 text-zinc-500 hover:text-red-400 rounded transition-colors"
+                                title="Delete"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </AppShell>
