@@ -154,9 +154,9 @@ export default function NewQuotationPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left: Form */}
-          <div className="col-span-5">
+          <div className="col-span-12 lg:col-span-5">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Product & Quantity */}
               <fieldset className="space-y-3">
@@ -249,7 +249,7 @@ export default function NewQuotationPage() {
           </div>
 
           {/* Right: Live Preview */}
-          <div className="col-span-7">
+          <div className="col-span-12 lg:col-span-7">
             <div className="sticky top-8">
               <div className="border border-zinc-800/80 rounded-xl overflow-hidden">
                 <div className="px-4 py-2.5 border-b border-zinc-800/80 bg-zinc-900/40 flex items-center justify-between">
@@ -264,38 +264,40 @@ export default function NewQuotationPage() {
                     <p className="text-zinc-600 text-[13px]">Select a product to see pricing</p>
                   </div>
                 ) : (
-                  <table className="w-full text-[13px]">
-                    <thead>
-                      <tr className="border-b border-zinc-800/60">
-                        <th className="px-4 py-2 text-left text-[11px] font-medium text-zinc-500 w-[40%]">Description</th>
-                        <th className="px-2 py-2 text-right text-[11px] font-medium text-zinc-500">Qty/Set</th>
-                        <th className="px-2 py-2 text-right text-[11px] font-medium text-zinc-500">Total</th>
-                        <th className="px-2 py-2 text-right text-[11px] font-medium text-zinc-500">Unit Price</th>
-                        <th className="px-4 py-2 text-right text-[11px] font-medium text-zinc-500">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {calculation.lineItems.map((item, i) => (
-                        <tr key={i} className="border-b border-zinc-800/30">
-                          <td className="px-4 py-2 text-zinc-300">{item.description.split("\n")[0]}</td>
-                          <td className="px-2 py-2 text-right text-zinc-500 tabular-nums">{item.qtyIn1Set}</td>
-                          <td className="px-2 py-2 text-right text-zinc-500 tabular-nums">{item.totalQty}</td>
-                          <td className="px-2 py-2 text-right text-zinc-500 tabular-nums">{fmtUsd(item.pricePerUnit)}</td>
-                          <td className="px-4 py-2 text-right text-zinc-200 font-mono tabular-nums">{fmtUsd(item.totalPrice)}</td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[13px] min-w-[500px] md:min-w-0">
+                      <thead>
+                        <tr className="border-b border-zinc-800/60">
+                          <th className="px-4 py-2 text-left text-[11px] font-medium text-zinc-500 w-[40%]">Description</th>
+                          <th className="px-2 py-2 text-right text-[11px] font-medium text-zinc-500">Qty/Set</th>
+                          <th className="px-2 py-2 text-right text-[11px] font-medium text-zinc-500">Total</th>
+                          <th className="px-2 py-2 text-right text-[11px] font-medium text-zinc-500">Unit Price</th>
+                          <th className="px-4 py-2 text-right text-[11px] font-medium text-zinc-500">Amount</th>
                         </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr className="bg-zinc-900/60">
-                        <td colSpan={4} className="px-4 py-3 text-right text-sm font-medium text-zinc-400">
-                          {numPumpsets} set{numPumpsets > 1 ? "s" : ""} · Ex-works
-                        </td>
-                        <td className="px-4 py-3 text-right text-base font-semibold text-zinc-100 font-mono tabular-nums">
-                          {fmtUsd(calculation.grandTotal)}
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {calculation.lineItems.map((item, i) => (
+                          <tr key={i} className="border-b border-zinc-800/30">
+                            <td className="px-4 py-2 text-zinc-300">{item.description.split("\n")[0]}</td>
+                            <td className="px-2 py-2 text-right text-zinc-500 tabular-nums">{item.qtyIn1Set}</td>
+                            <td className="px-2 py-2 text-right text-zinc-500 tabular-nums">{item.totalQty}</td>
+                            <td className="px-2 py-2 text-right text-zinc-500 tabular-nums">{fmtUsd(item.pricePerUnit)}</td>
+                            <td className="px-4 py-2 text-right text-zinc-200 font-mono tabular-nums">{fmtUsd(item.totalPrice)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-zinc-900/60">
+                          <td colSpan={4} className="px-4 py-3 text-right text-sm font-medium text-zinc-400">
+                            {numPumpsets} set{numPumpsets > 1 ? "s" : ""} · Ex-works
+                          </td>
+                          <td className="px-4 py-3 text-right text-base font-semibold text-zinc-100 font-mono tabular-nums">
+                            {fmtUsd(calculation.grandTotal)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 )}
               </div>
             </div>

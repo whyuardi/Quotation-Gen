@@ -119,7 +119,7 @@ export default function QuotationDetailPage({
         </div>
 
         {/* Info grid */}
-        <div className="grid grid-cols-3 gap-px bg-zinc-800/50 border border-zinc-800/80 rounded-xl overflow-hidden mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-zinc-800/50 border border-zinc-800/80 rounded-xl overflow-hidden mb-6">
           <div className="bg-zinc-950 p-4">
             <p className="text-[11px] text-zinc-500 uppercase tracking-wider mb-2">Quotation</p>
             <div className="space-y-1 text-[13px]">
@@ -152,40 +152,42 @@ export default function QuotationDetailPage({
             <div className="px-4 py-2.5 border-b border-zinc-800/80 bg-zinc-900/40">
               <h3 className="text-[13px] font-medium text-zinc-400">Itemized Pricing</h3>
             </div>
-            <table className="w-full text-[13px]">
-              <thead>
-                <tr className="border-b border-zinc-800/60">
-                  <th className="px-4 py-2 text-left text-[11px] font-medium text-zinc-500 w-8">#</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-medium text-zinc-500">Description</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-medium text-zinc-500">Qty/Set</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-medium text-zinc-500">Total Qty</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-medium text-zinc-500">Price/Unit</th>
-                  <th className="px-4 py-2 text-right text-[11px] font-medium text-zinc-500">Total (USD)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {quotation.calculatedTotals.lineItems.map((item, i) => (
-                  <tr key={i} className="border-b border-zinc-800/30 hover:bg-zinc-900/40 transition-colors">
-                    <td className="px-4 py-2 text-zinc-600">{i + 1}</td>
-                    <td className="px-3 py-2 text-zinc-300">{item.description.split("\n")[0]}</td>
-                    <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">{item.qtyIn1Set}</td>
-                    <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">{item.totalQty}</td>
-                    <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">{fmtUsd(item.pricePerUnit)}</td>
-                    <td className="px-4 py-2 text-right text-zinc-200 font-mono tabular-nums">{fmtUsd(item.totalPrice)}</td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-[13px] min-w-[700px] md:min-w-0">
+                <thead>
+                  <tr className="border-b border-zinc-800/60">
+                    <th className="px-4 py-2 text-left text-[11px] font-medium text-zinc-500 w-8">#</th>
+                    <th className="px-3 py-2 text-left text-[11px] font-medium text-zinc-500">Description</th>
+                    <th className="px-3 py-2 text-right text-[11px] font-medium text-zinc-500">Qty/Set</th>
+                    <th className="px-3 py-2 text-right text-[11px] font-medium text-zinc-500">Total Qty</th>
+                    <th className="px-3 py-2 text-right text-[11px] font-medium text-zinc-500">Price/Unit</th>
+                    <th className="px-4 py-2 text-right text-[11px] font-medium text-zinc-500">Total (USD)</th>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="bg-zinc-900/60">
-                  <td colSpan={5} className="px-4 py-3 text-right text-sm font-medium text-zinc-400">
-                    Grand Total
-                  </td>
-                  <td className="px-4 py-3 text-right text-base font-semibold text-zinc-100 font-mono tabular-nums">
-                    {fmtUsd(quotation.calculatedTotals.grandTotal)}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+                </thead>
+                <tbody>
+                  {quotation.calculatedTotals.lineItems.map((item, i) => (
+                    <tr key={i} className="border-b border-zinc-800/30 hover:bg-zinc-900/40 transition-colors">
+                      <td className="px-4 py-2 text-zinc-600">{i + 1}</td>
+                      <td className="px-3 py-2 text-zinc-300">{item.description.split("\n")[0]}</td>
+                      <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">{item.qtyIn1Set}</td>
+                      <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">{item.totalQty}</td>
+                      <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">{fmtUsd(item.pricePerUnit)}</td>
+                      <td className="px-4 py-2 text-right text-zinc-200 font-mono tabular-nums">{fmtUsd(item.totalPrice)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-zinc-900/60">
+                    <td colSpan={5} className="px-4 py-3 text-right text-sm font-medium text-zinc-400">
+                      Grand Total
+                    </td>
+                    <td className="px-4 py-3 text-right text-base font-semibold text-zinc-100 font-mono tabular-nums">
+                      {fmtUsd(quotation.calculatedTotals.grandTotal)}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           </div>
         )}
       </div>
